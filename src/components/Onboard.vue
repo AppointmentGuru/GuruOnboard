@@ -1,19 +1,34 @@
 <template>
 <div>
-
+  <!-- LI: {{loggedin}}<br/>
+  CD: {{customerDetails}}<br/>
+  PP: {{practiceDetails}}<br/> -->
   <transition name="fade" mode="out-in" >
     <who-am-i
       id='whoami' key='whoami'
-      v-if='meRequest === -1 || meRequest.status !== 200'
+      v-if='loggedin===false'
       @whoami:loggedin='getMe' >
     </who-am-i>
 
+    <customer-details
+      v-else-if='loggedin===true && customerDetails === false'
+      key='customerdetails'
+      @customerdetails:profilesaved='customerDetails=true'
+      :initial-data='profile' >
+    </customer-details>
+
     <!-- customer details -->
-
-    <practitioner-practice v-else key='practitioner-practice' >
+    <practitioner-practice
+      v-else-if='customerDetails === true && practiceDetails === false'
+      @practice:saved='practiceDetails=true'
+      key='practitioner-practice'
+      :practitioner-id='profile.id'
+      :initial-data='practice' >
     </practitioner-practice>
-  </transition>
 
+    <donezo v-else ></donezo>
+  </transition>
+  <!-- <pre>{{ profile }}</pre> -->
 </div>
 <!--
 * Who are you / create account
@@ -24,128 +39,65 @@
 </template>
 <script type="text/javascript">
 import Mixins from 'vuex-requests/src/store/mixins'
-import FieldErrorMessages from 'vuex-requests/src/components/FieldErrorMessages'
 import WhoAmI from './forms/WhoAmI'
 import PractitionerPractice from './forms/PractitionerPractice'
+import CustomerDetails from './forms/CustomerDetails'
+import Donezo from './forms/Donezo'
 
-const ID_REQUEST = 'auth-identify-request'
-const LOGIN_REQUEST = 'auth-login-request'
 const ME_REQUEST = 'me-request'
-const UPDATE_PROFILE_REQUEST = 'update-profile-request'
 
 export default {
   name: 'Onboard',
   mixins: [Mixins],
-  components: {FieldErrorMessages, WhoAmI, PractitionerPractice},
+  components: {WhoAmI, PractitionerPractice, CustomerDetails, Donezo},
   data () {
     return {
-      getIdId: null,
-      showOTP: false,
-      show: true,
-      user: {},
-      contacts: {},
-      profile: {
-        sub_domain: '',
-        practice_name: '',
-        is_website_published: '',
-        is_visible_in_app: ''
-      }
-    }
-  },
-  watch: {
-    practiceName () {
-      this.profile.sub_domain = this._slugify(this.practiceName)
-    },
-    loginRequestStatus () {
-      if (this.loginRequestStatus === 200) {
-        let token = this.loginRequest.result.data.token
-        let data = [
-          this.$appointmentguru.name,
-          'Authorization',
-          `token ${token}`
-        ]
-        this.$requeststore.commit('BACKEND_CONFIG_SET_HEADER', data)
-        this.getMe()
-      }
+      imageUrl: null,
+      loggedin: false,
+      customerDetails: false,
+      practiceDetails: false
     }
   },
   computed: {
-    practiceName () {
-      return this.profile.practice_name
-    },
-    updateProfileRequest () {
-      return this.$requeststore.getters
-              .getRequestById(UPDATE_PROFILE_REQUEST)
-    },
-    identifyRequest () {
-      return this.$requeststore.getters.getRequestById(ID_REQUEST)
-    },
-    loginRequest () {
-      return this.$requeststore.getters.getRequestById(LOGIN_REQUEST)
-    },
-    loginRequestStatus () {
-      let r = this.loginRequest
-      if (r === -1) { return 0 } else { return r.status }
-    },
     meRequest () {
       return this.$requeststore.getters.getRequestById(ME_REQUEST)
     },
-    nextStep () {
-      if (this.identifyRequest !== -1) {
-        if (this.identifyRequest.result && this.identifyRequest.result.data) {
-          return this.identifyRequest.result.data.type
+    getUser () {
+      if (this.meRequest !== -1) {
+        if (this.meRequest.result &&
+            this.meRequest.result.data &&
+            this.meRequest.result.data.results) {
+          return this.meRequest.result.data.results[0]
         }
       }
-      return null
+      return {profile: {}}
+    },
+    profile () {
+      let r = this.getUser
+      return {
+        id: r.id,
+        fullName: `${r.first_name} ${r.last_name}`,
+        email: r.email,
+        phoneNumber: r.phone_number,
+        is_practitioner: true
+      }
+    },
+    practice () {
+      let r = this.getUser
+      return {
+        sub_domain: r.profile.sub_domain,
+        practice_name: r.profile.practice_name,
+        is_website_published: r.profile.is_website_published,
+        is_visible_in_app: r.profile.is_visible_in_app
+      }
     }
   },
   methods: {
-    _requestById (id) {
-      return this.$requeststore.getters.getRequestById(id)
-    },
-    _slugify (text) {
-      return text.toString().toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '')
-        .replace(/--+/g, '-')
-        .replace(/^-+/, '')
-        .replace(/-+$/, '')
-    },
-    getId () {
-      let options = {
-        id: ID_REQUEST,
-        params: {phone_number: this.user.phoneNumber}
-      }
-      this.$appointmentguru
-        .endpoint('auth-identify', options)
-          // .then((result) => { this.getIdId = result })
-    },
-    autoLogin () {
-      this.user.phoneNumber = '+27832566533'
-      this.user.password = 'testtest'
-      this.login()
-    },
-    login () {
-      let options = {
-        id: LOGIN_REQUEST,
-        data: {
-          phone_number: this.user.phoneNumber,
-          password: this.user.password
-        }
-      }
-      this.$appointmentguru
-        .endpoint('auth-login-phone', options)
-    },
     getMe () {
+      this.loggedin = true
       this.$appointmentguru
-        .resource('practitioner.me.profile')
+        .resource('practitioner.me')
         .id(ME_REQUEST).list()
-    },
-    saveProfile () {
-      let id = this.meRequest.result.data[0].user
-      this.$appointmentguru
-        .resource('practitioner.me.profile')
-        .id(UPDATE_PROFILE_REQUEST).save(id, this.profile)
     }
   }
 }

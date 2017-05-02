@@ -1,5 +1,5 @@
 <template>
-<el-card v-else id='profile-form' key='profile' >
+<el-card id='profile-form' >
   <div slot="header" class="clearfix">
     <strong style="line-height: 36px;">Your Practice</strong>
     <el-button
@@ -7,8 +7,9 @@
       :loading='requestIsLoading(updateProfileRequest)'
       style="float: right;" type="primary">Save profile</el-button>
   </div>
-
-  <el-form v-loading="requestIsLoading(updateProfileRequest)" >
+  <el-form
+    v-if='id'
+    v-loading="requestIsLoading(updateProfileRequest)" >
     <el-form-item label='What is the name of your practice?' >
       <el-input  v-model="profile.practice_name" >
       </el-input>
@@ -28,7 +29,6 @@
         :request='updateProfileRequest'
         field='sub_domain' ></field-error-messages>
     </el-form-item>
-
     <h4>
       Visibility settings
       <el-tooltip content="You can always change these later from your settings page in the web app" placement="right">
@@ -52,6 +52,7 @@
     </el-form-item>
 
   </el-form>
+  <el-alert v-else title='No user specified, perhaps you need to login?' ></el-alert>
 </el-card>
 </template>
 <script type="text/javascript">
@@ -65,23 +66,40 @@ export default {
   mixins: [Mixins],
   components: {FieldErrorMessages},
   props: {
+    practitionerId: { type: Number, required: true },
     initialData: { type: Object, default: () => { return {} } }
   },
   data () {
     return {
+      id: this.practitionerId,
       profile: {
-        sub_domain: '',
-        practice_name: '',
-        is_website_published: '',
-        is_visible_in_app: ''
+        touched: null,
+        sub_domain: null,
+        practice_name: null,
+        is_website_published: null,
+        is_visible_in_app: null
       }
     }
   },
+  mounted () {
+    this.profile = this.initialData
+  },
   watch: {
+    updateProfileRequestStatus () {
+      if (this.updateProfileRequestStatus === 200) {
+        this.$emit('practice:saved', this.profile)
+      }
+    },
     practiceName () {
       this.profile.sub_domain = this._slugify(this.practiceName)
     },
+    practitionerId () {
+      this.id = this.practitionerId
+    },
     initialData () {
+      if (!this.profile.touched) {
+        this.profile = this.initialData
+      }
     }
   },
   computed: {
@@ -91,6 +109,12 @@ export default {
     updateProfileRequest () {
       return this.$requeststore.getters
               .getRequestById(UPDATE_PROFILE_REQUEST)
+    },
+    updateProfileRequestStatus () {
+      if (this.updateProfileRequest !== -1) {
+        return this.updateProfileRequest.status
+      }
+      return 0
     }
   },
   methods: {
@@ -103,10 +127,10 @@ export default {
         .replace(/-+$/, '')
     },
     saveProfile () {
-      let id = 1 // fix this:
+      this.profile.touched = true
       this.$appointmentguru
         .resource('practitioner.me.profile')
-        .id(UPDATE_PROFILE_REQUEST).save(id, this.profile)
+        .id(UPDATE_PROFILE_REQUEST).save(this.id, this.profile)
     }
   }
 }
