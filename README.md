@@ -1,6 +1,6 @@
-# guruonboard
+# onboardguru
 
-> Onboarding process for practitioners
+> Onboard a practitioner like a pro
 
 ## Build Setup
 

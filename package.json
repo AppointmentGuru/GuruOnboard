@@ -1,8 +1,8 @@
 {
-  "name": "guruonboard",
+  "name": "onboardguru",
   "version": "1.0.0",
-  "description": "Onboarding process for practitioners",
-  "author": "Christo Crampton <christo@appointmentguru.co>",
+  "description": "Onboard a practitioner like a pro",
+  "author": "AppointmentGuru <dev@appointmentguru.co>",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
@@ -15,7 +15,9 @@
   },
   "dependencies": {
     "element-ui": "^1.2.9",
-    "vue": "^2.2.6"
+    "vue": "^2.2.6",
+    "vuex": "^2.3.1",
+    "vuex-requests": "git+ssh://git@github.com/AppointmentGuru/VuexRequests.git"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.2",

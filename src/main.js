@@ -2,18 +2,27 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
-
-import locale from 'element-ui/lib/locale/lang/en'
 import ElementUI from 'element-ui'
+
 import 'element-ui/lib/theme-default/index.css'
 
-Vue.use(ElementUI, {locale})
+import store from 'vuex-requests/src/store/plugin'
+import AppointmentGuruBackend from 'vuex-requests/src/store/backends/appointmentguru'
+
+let backends = [
+  {
+    name: 'appointmentguru',
+    class: AppointmentGuruBackend
+  }
+]
+Vue.use(store, backends)
+Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: '#appointmentguruonboarder',
   template: '<App/>',
   components: { App }
 })
