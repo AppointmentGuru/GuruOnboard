@@ -7,7 +7,8 @@
     <who-am-i
       id='whoami' key='whoami'
       v-if='loggedin===false'
-      @whoami:loggedin='getMe' >
+      @whoami:loggedin='getMe'
+      @whoami:registered='registered' >
     </who-am-i>
 
     <customer-details
@@ -23,7 +24,7 @@
       @practice:saved='practiceDetails=true'
       key='practitioner-practice'
       :practitioner-id='profile.id'
-      :initial-data='practice' >
+      :initial-data='practice || {}' >
     </practitioner-practice>
 
     <donezo v-else ></donezo>
@@ -84,15 +85,24 @@ export default {
     },
     practice () {
       let r = this.getUser
-      return {
-        sub_domain: r.profile.sub_domain,
-        practice_name: r.profile.practice_name,
-        is_website_published: r.profile.is_website_published,
-        is_visible_in_app: r.profile.is_visible_in_app
+      if (r.profile) {
+        return {
+          sub_domain: r.profile.sub_domain,
+          practice_name: r.profile.practice_name,
+          is_website_published: r.profile.is_website_published,
+          is_visible_in_app: r.profile.is_visible_in_app
+        }
       }
     }
   },
   methods: {
+    registered () {
+      this.customerDetails = true
+      this.loggedin = true
+      this.$appointmentguru
+        .resource('practitioner.me')
+        .id(ME_REQUEST).list()
+    },
     getMe () {
       this.loggedin = true
       this.$appointmentguru

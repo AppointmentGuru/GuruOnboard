@@ -8,7 +8,9 @@
     <strong style="line-height: 36px;">Let's get started</strong>
 
     <el-button
+      :loading='requestIsLoading(registerRequest)'
       v-if='nextStep === "auth-register"'
+      @click='performRegistration'
       type="primary" class='action-button' >Create account
     </el-button>
     <el-button
@@ -16,6 +18,7 @@
       type="primary" class='action-button' >Submit OTP
     </el-button>
     <el-button
+      :loading='requestIsLoading(loginRequest)'
       v-else-if='nextStep === "token-auth"'
       @click='login'
       type="primary" class='action-button' >Login
@@ -44,16 +47,19 @@
   </el-form>
 
   <transition name='fade' >
-  <el-form v-if='nextStep === "auth-register"' >
+  <el-form
+    v-if='nextStep === "auth-register"'
+    v-loading='requestIsLoading(registerRequest)' >
     <el-form-item label='Your full name?' >
       <el-input v-model='user.fullName' ></el-input>
     </el-form-item>
     <el-form-item label='E-mail' >
-      <el-input v-model='user.password' ></el-input>
+      <el-input v-model='user.email' ></el-input>
     </el-form-item>
     <el-form-item label='Pick a password' >
       <el-input v-model='user.password' ></el-input>
     </el-form-item>
+    <pre>{{registerRequestStatus}}</pre>
   </el-form>
   </transition>
 
@@ -94,6 +100,7 @@
 const ID_REQUEST = 'auth-identify-request'
 const LOGIN_REQUEST = 'auth-login-request'
 const OTP_AUTH_REQUEST = 'auth-validate-otp'
+const REGISTER_REQUEST = 'auth-register'
 
 import Mixins from 'vuex-requests/src/store/mixins'
 import FieldErrorMessages from 'vuex-requests/src/components/FieldErrorMessages'
@@ -127,6 +134,13 @@ export default {
         this.setToken(token)
         this.$emit('whoami:loggedin')
       }
+    },
+    registerRequestStatus () {
+      if (this.registerRequestStatus === 200) {
+        let token = this.registerRequest.result.data.token
+        this.setToken(token)
+        this.$emit('whoami:registered')
+      }
     }
   },
   computed: {
@@ -145,6 +159,13 @@ export default {
     },
     validateOtpRequestStatus () {
       let r = this.validateOtpRequest
+      if (r === -1) { return 0 } else { return r.status }
+    },
+    registerRequest () {
+      return this.$requeststore.getters.getRequestById(REGISTER_REQUEST)
+    },
+    registerRequestStatus () {
+      let r = this.registerRequest
       if (r === -1) { return 0 } else { return r.status }
     },
     nextStep () {
@@ -209,6 +230,21 @@ export default {
         `token ${token}`
       ]
       this.$requeststore.commit('BACKEND_CONFIG_SET_HEADER', data)
+    },
+    performRegistration () {
+      let options = {
+        id: REGISTER_REQUEST,
+        data: {
+          phone_number: this.user.phoneNumber,
+          password1: this.user.password,
+          password2: this.user.password,
+          full_name: this.user.fullName,
+          email: this.user.email,
+          is_practitioner: true
+        }
+      }
+      this.$appointmentguru
+        .endpoint('auth-register', options)
     }
   }
 }
