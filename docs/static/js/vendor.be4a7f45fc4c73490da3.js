@@ -39063,6 +39063,17 @@ class AppointmentGuruBackend extends __WEBPACK_IMPORTED_MODULE_0__API__["a" /* d
           phone_number: { type: 'number', required: true },
           password: { type: 'string', required: true }
         }
+      },
+      'auth-register': {
+        url: 'api/auth/register/',
+        method: 'POST',
+        params: {
+          full_name: { type: 'strong', required: true },
+          email: { type: 'email', required: true },
+          phone_number: { type: 'number', required: true },
+          password1: { type: 'string', required: true },
+          password2: { type: 'string', required: true }
+        }
       }
     }
   }
@@ -49185,4 +49196,4 @@ function applyToTag (styleElement, obj) {
 
 /***/ })
 ]);
-//# sourceMappingURL=vendor.ad2b9b1e5331d1568f22.js.map
+//# sourceMappingURL=vendor.be4a7f45fc4c73490da3.js.map
