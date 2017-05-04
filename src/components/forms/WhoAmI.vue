@@ -5,7 +5,7 @@
 <el-card id='whoami' key='whoami' >
 
   <div slot="header" class="clearfix">
-    <strong style="line-height: 36px;">Let's get started</strong>
+    <strong class='card-header' >Let's get started</strong>
 
     <el-button
       :loading='requestIsLoading(registerRequest)'
@@ -51,14 +51,14 @@
     v-if='nextStep === "auth-register"'
     v-loading='requestIsLoading(registerRequest)' >
     <h3>{{createAccountHeader}}</h3>
-    <el-form-item label='Your full name?' >
+    <el-form-item label='Full name' >
       <el-input v-model='user.fullName' ></el-input>
     </el-form-item>
     <el-form-item label='E-mail' >
       <el-input v-model='user.email' ></el-input>
     </el-form-item>
     <el-form-item label='Pick a password' >
-      <el-input v-model='user.password' ></el-input>
+      <el-input v-model='user.password' type='password' ></el-input>
     </el-form-item>
   </el-form>
   </transition>
@@ -81,7 +81,7 @@
   <el-form v-if='nextStep === "token-auth"' >
     <h3>{{loginHeader}}</h3>
     <el-form-item label='Please enter your password' >
-      <el-input v-model='user.password' ></el-input>
+      <el-input v-model='user.password' type='password' ></el-input>
       <el-button
         @click='showOTP = true'
         type='text' size='small' >Forgot password</el-button>

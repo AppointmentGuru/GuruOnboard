@@ -1,7 +1,7 @@
 <template>
 <el-card id='profile-form' >
   <div slot="header" class="clearfix">
-    <strong style="line-height: 36px;">Your Practice</strong>
+    <strong class='card-header' >Your Practice</strong>
     <el-button
       @click='saveProfile'
       :loading='requestIsLoading(updateProfileRequest)'

@@ -1,5 +1,14 @@
+<style>
+#onboarder .card-header {
+  color: #1F2D3D;
+  font-weight: 400;
+  line-height: 36px;
+  font-size:30px;
+}
+</style>
 <template>
-<div>
+
+<div id='onboarder'>
   <!-- LI: {{loggedin}}<br/>
   CD: {{customerDetails}}<br/>
   PP: {{practiceDetails}}<br/> -->

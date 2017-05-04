@@ -1,7 +1,7 @@
 <template>
 <el-card id='profile-contacts'>
   <div slot="header" class="clearfix">
-    <strong style="line-height: 36px;">{{title}}</strong>
+    <strong class='card-header' >{{title}}</strong>
     <el-button
       @click='saveProfile'
       :loading='requestIsLoading(profileRequest)'
