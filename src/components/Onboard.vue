@@ -15,6 +15,7 @@
       v-else-if='loggedin===true && customerDetails === false'
       key='customerdetails'
       @customerdetails:profilesaved='customerDetails=true'
+      buttonText='Confirm details'
       :initial-data='profile' >
     </customer-details>
 
@@ -22,6 +23,7 @@
     <practitioner-practice
       v-else-if='customerDetails === true && practiceDetails === false'
       @practice:saved='practiceDetails=true'
+      title='Tell us a little about your practice'
       key='practitioner-practice'
       :practitioner-id='profile.id'
       :initial-data='practice || {}' >

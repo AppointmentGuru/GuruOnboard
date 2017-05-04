@@ -10,6 +10,7 @@
   <el-form
     v-if='id'
     v-loading="requestIsLoading(updateProfileRequest)" >
+    <h3>{{title}}</h3>
     <el-form-item label='What is the name of your practice?' >
       <el-input  v-model="profile.practice_name" >
       </el-input>
@@ -67,6 +68,7 @@ export default {
   components: {FieldErrorMessages},
   props: {
     practitionerId: { type: Number, required: true },
+    title: { type: String, default: 'Details for your practice' },
     initialData: { type: Object, default: () => { return {} } }
   },
   data () {

@@ -39,7 +39,7 @@
       class='pull-right' style='margin-top:5px;' >
     <i class="el-icon-loading" ></i>
     </span>
-    <el-form-item label='Please provide your phone number' >
+    <el-form-item label='What is your phone number?' >
       <el-input
         @change='checkPhoneLength'
         v-model='user.phoneNumber' ></el-input>
@@ -50,6 +50,7 @@
   <el-form
     v-if='nextStep === "auth-register"'
     v-loading='requestIsLoading(registerRequest)' >
+    <h3>{{createAccountHeader}}</h3>
     <el-form-item label='Your full name?' >
       <el-input v-model='user.fullName' ></el-input>
     </el-form-item>
@@ -59,12 +60,12 @@
     <el-form-item label='Pick a password' >
       <el-input v-model='user.password' ></el-input>
     </el-form-item>
-    <pre>{{registerRequestStatus}}</pre>
   </el-form>
   </transition>
 
   <transition name='fade' >
   <el-form v-show='nextStep === "auth-otp" || showOTP === true' >
+    <h3>{{otpHeader}}</h3>
     <span
       v-show='requestIsLoading(validateOtpRequest)'
       class='pull-right' style='margin-top:5px;' >
@@ -78,6 +79,7 @@
 
   <transition name='fade' >
   <el-form v-if='nextStep === "token-auth"' >
+    <h3>{{loginHeader}}</h3>
     <el-form-item label='Please enter your password' >
       <el-input v-model='user.password' ></el-input>
       <el-button
@@ -90,7 +92,8 @@
   <transition name='fade' >
   <el-form v-show='nextStep === "set-password"' >
     <el-form-item label='Please set your password' >
-      <el-input v-model='user.otp' ></el-input>
+      <h3>{{createPasswordHeader}}</h3>
+      <el-input v-model='user.password' ></el-input>
     </el-form-item>
   </el-form>
   </transition>
@@ -110,7 +113,11 @@ export default {
   mixins: [Mixins],
   components: {FieldErrorMessages},
   props: {
-    initialData: { type: Object, default: () => { return {} } }
+    initialData: { type: Object, default: () => { return {} } },
+    otpHeader: { type: String, default: 'Please enter your OTP' },
+    createPasswordHeader: { type: String, default: 'Please choose a password' },
+    createAccountHeader: { type: String, default: 'Tell us a little about yourself' },
+    loginHeader: { type: String, default: 'Please login' }
   },
   data () {
     return {

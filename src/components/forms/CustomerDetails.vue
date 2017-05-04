@@ -9,6 +9,7 @@
   </div>
   <el-form
     v-loading='requestIsLoading(profileRequest)' >
+    <h3>{{contactDetailsHeader}}</h3>
     <el-form-item label='Your name' >
       <el-input  v-model="user.fullName" >
       </el-input>
@@ -37,7 +38,8 @@ export default {
   props: {
     title: { type: String, default: 'Contact details' },
     buttonText: { type: String, default: 'Save contact details' },
-    initialData: { type: Object, default: () => { return {} } }
+    initialData: { type: Object, default: () => { return {} } },
+    contactDetailsHeader: { type: String, default: 'Please confirm that your contact details are correct' }
   },
   data () {
     return {
