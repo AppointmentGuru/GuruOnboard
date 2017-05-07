@@ -39056,6 +39056,15 @@ class AppointmentGuruBackend extends __WEBPACK_IMPORTED_MODULE_0__API__["a" /* d
           otp: { type: 'number', required: true }
         }
       },
+      'auth-set-password': {
+        url: 'api/auth/set-password/',
+        method: 'POST',
+        requiresAuth: true,
+        params: {
+          phone_number: { type: 'number', required: true },
+          otp: { type: 'number', required: true }
+        }
+      },
       'auth-login-phone': {
         url: 'api/auth/phone/token/',
         method: 'POST',
@@ -39074,6 +39083,11 @@ class AppointmentGuruBackend extends __WEBPACK_IMPORTED_MODULE_0__API__["a" /* d
           password1: { type: 'string', required: true },
           password2: { type: 'string', required: true }
         }
+      },
+      'me': {
+        url: 'api/users/me/',
+        method: 'PATCH',
+        params: {}
       }
     }
   }
@@ -47916,9 +47930,7 @@ class API {
   resource (resourceName) {
     let url = this.resources()[resourceName]
     if (this.baseUrl) { url = `${this.baseUrl}/${url}` }
-
     Object.assign(this.headers, __WEBPACK_IMPORTED_MODULE_0__store__["a" /* default */].getters.getBackendConfig(this.name).headers)
-
     return new Resource(resourceName, url, this.headers)
   }
   endpoint (name, options = {}) {
@@ -47927,9 +47939,13 @@ class API {
     let url = endpoint.url
     if (this.baseUrl) { url = `${this.baseUrl}/${url}` }
 
+    if (endpoint.requiresAuth) {
+      Object.assign(this.headers, __WEBPACK_IMPORTED_MODULE_0__store__["a" /* default */].getters.getBackendConfig(this.name).headers)
+    }
     let req = {
       url: url,
-      method: method
+      method: method,
+      headers: this.headers
     }
     Object.assign(req, options)
     return __WEBPACK_IMPORTED_MODULE_0__store__["a" /* default */].dispatch(method.toUpperCase(), req)
@@ -49197,4 +49213,4 @@ function applyToTag (styleElement, obj) {
 
 /***/ })
 ]);
-//# sourceMappingURL=vendor.5497f5cc907e29cd9be4.js.map
+//# sourceMappingURL=vendor.f49f1c1dcc931d6ba6e3.js.map
