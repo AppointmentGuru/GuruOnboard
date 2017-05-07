@@ -13,10 +13,19 @@
     <el-form-item label='Your name' >
       <el-input  v-model="user.fullName" >
       </el-input>
+      <field-error-messages
+        :request='profileRequest'
+        field='first_name' ></field-error-messages>
+      <field-error-messages
+        :request='profileRequest'
+        field='last_name' ></field-error-messages>
     </el-form-item>
     <el-form-item label='Your e-mail' >
       <el-input  v-model="user.email" >
       </el-input>
+      <field-error-messages
+        :request='profileRequest'
+        field='email' ></field-error-messages>
     </el-form-item>
     <!-- <el-form-item label='Choose a password' >
       <el-input  v-model="user.password" type='password' >

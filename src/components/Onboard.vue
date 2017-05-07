@@ -12,11 +12,12 @@
   <!-- LI: {{loggedin}}<br/>
   CD: {{customerDetails}}<br/>
   PP: {{practiceDetails}}<br/> -->
+
   <transition name="fade" mode="out-in" >
     <who-am-i
       id='whoami' key='whoami'
       v-if='loggedin===false'
-      @whoami:loggedin='getMe'
+      @whoami:loggedin='setPractitioner'
       @whoami:registered='registered' >
     </who-am-i>
 
@@ -57,6 +58,7 @@ import CustomerDetails from './forms/CustomerDetails'
 import Donezo from './forms/Donezo'
 
 const ME_REQUEST = 'me-request'
+const MAKE_PRACTITIONER_REQUEST = 'make-practitioner-request'
 
 export default {
   name: 'Onboard',
@@ -70,9 +72,22 @@ export default {
       practiceDetails: false
     }
   },
+  watch: {
+    makePractitionerRequestStatus () {
+      if (this.makePractitionerRequestStatus === 200) {
+        this.getMe()
+      }
+    }
+  },
   computed: {
     meRequest () {
       return this.$requeststore.getters.getRequestById(ME_REQUEST)
+    },
+    makePractitionerRequest () {
+      return this.$requeststore.getters.getRequestById(MAKE_PRACTITIONER_REQUEST)
+    },
+    makePractitionerRequestStatus () {
+      return this.makePractitionerRequest.status
     },
     getUser () {
       if (this.meRequest !== -1) {
@@ -113,6 +128,13 @@ export default {
       this.$appointmentguru
         .resource('practitioner.me')
         .id(ME_REQUEST).list()
+    },
+    setPractitioner () {
+      let data = { is_practitioner: true }
+      this.$appointmentguru
+        .resource('users')
+        .id(MAKE_PRACTITIONER_REQUEST)
+        .save('me', data)
     },
     getMe () {
       this.loggedin = true

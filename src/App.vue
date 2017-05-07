@@ -53,4 +53,8 @@ pre {
 .slide-enter, .slide-leave-to /* .slide-leave-active in <2.1.8 */ {
   height:0px;
 }
+.error-container {
+  line-height: 20px !important;
+}
+.error { color: red; }
 </style>

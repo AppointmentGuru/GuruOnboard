@@ -43,6 +43,18 @@
       <el-input
         @change='checkPhoneLength'
         v-model='user.phoneNumber' ></el-input>
+      <field-error-messages
+        :request='registerRequest'
+        field='phone_number' ></field-error-messages>
+      <field-error-messages
+        :request='loginRequest'
+        field='phone_number' ></field-error-messages>
+      <field-error-messages
+        :request='identifyRequest'
+        field='phone_number' ></field-error-messages>
+      <field-error-messages
+        :request='validateOtpRequest'
+        field='phone_number' ></field-error-messages>
     </el-form-item>
   </el-form>
 
@@ -53,12 +65,27 @@
     <h3>{{createAccountHeader}}</h3>
     <el-form-item label='Full name' >
       <el-input v-model='user.fullName' ></el-input>
+      <field-error-messages
+        :request='registerRequest'
+        field='first_name' ></field-error-messages>
+      <field-error-messages
+        :request='registerRequest'
+        field='last_name' ></field-error-messages>
     </el-form-item>
     <el-form-item label='E-mail' >
       <el-input v-model='user.email' ></el-input>
+      <field-error-messages
+        :request='registerRequest'
+        field='email' ></field-error-messages>
     </el-form-item>
     <el-form-item label='Pick a password' >
       <el-input v-model='user.password' type='password' ></el-input>
+      <field-error-messages
+        :request='registerRequest'
+        field='password1' ></field-error-messages>
+      <field-error-messages
+        :request='registerRequest'
+        field='password2' ></field-error-messages>
     </el-form-item>
   </el-form>
   </transition>
