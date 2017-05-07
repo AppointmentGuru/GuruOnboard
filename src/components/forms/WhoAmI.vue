@@ -8,19 +8,27 @@
     <strong class='card-header' >Let's get started</strong>
 
     <el-button
-      :loading='requestIsLoading(registerRequest)'
       v-if='nextStep === "auth-register"'
       @click='performRegistration'
+      :loading='requestIsLoading(registerRequest)'
       type="primary" class='action-button' >Create account
     </el-button>
     <el-button
+      v-else-if='showSetPassword'
+      @click='setPassword'
+      :loading='requestIsLoading(setPasswordRequest)'
+      type="primary" class='action-button' >Set password
+    </el-button>
+    <el-button
       v-else-if='nextStep === "otp-auth"'
+      @click='validateOTP'
+      :loading='requestIsLoading(validateOtpRequest)'
       type="primary" class='action-button' >Submit OTP
     </el-button>
     <el-button
-      :loading='requestIsLoading(loginRequest)'
       v-else-if='nextStep === "token-auth"'
       @click='login'
+      :loading='requestIsLoading(loginRequest)'
       type="primary" class='action-button' >Login
     </el-button>
     <span v-else >
@@ -100,6 +108,9 @@
     </span>
     <el-form-item label='Please enter your OTP' >
       <el-input @change='checkOTPLength' v-model='user.otp' ></el-input>
+      <field-error-messages
+        :request='validateOtpRequest'
+        field='otp' ></field-error-messages>
     </el-form-item>
   </el-form>
   </transition>
@@ -117,10 +128,15 @@
   </transition>
 
   <transition name='fade' >
-  <el-form v-show='nextStep === "set-password"' >
-    <el-form-item label='Please set your password' >
-      <h3>{{createPasswordHeader}}</h3>
-      <el-input v-model='user.password' ></el-input>
+  <el-form v-if='showSetPassword' >
+    <h3>{{createPasswordHeader}}</h3>
+    <el-form-item
+      label='Password'
+      v-loading='requestIsLoading(setPasswordRequest)' >
+      <el-input v-model='user.password' type='password' ></el-input>
+      <field-error-messages
+        :request='setPasswordRequest'
+        field='password' ></field-error-messages>
     </el-form-item>
   </el-form>
   </transition>
@@ -130,6 +146,7 @@
 const ID_REQUEST = 'auth-identify-request'
 const LOGIN_REQUEST = 'auth-login-request'
 const OTP_AUTH_REQUEST = 'auth-validate-otp'
+const SET_PASSWORD_REQUEST = 'auth-set-password'
 const REGISTER_REQUEST = 'auth-register'
 
 import Mixins from 'vuex-requests/src/store/mixins'
@@ -149,6 +166,7 @@ export default {
   data () {
     return {
       showOTP: false,
+      showSetPassword: false,
       user: {
         phoneNumber: '+27'
       }
@@ -166,6 +184,11 @@ export default {
       if (this.validateOtpRequestStatus === 200) {
         let token = this.validateOtpRequest.result.data.token
         this.setToken(token)
+        this.showSetPassword = true
+      }
+    },
+    setPasswordRequestStatus () {
+      if (this.setPasswordRequestStatus === 200) {
         this.$emit('whoami:loggedin')
       }
     },
@@ -193,6 +216,13 @@ export default {
     },
     validateOtpRequestStatus () {
       let r = this.validateOtpRequest
+      if (r === -1) { return 0 } else { return r.status }
+    },
+    setPasswordRequest () {
+      return this.$requeststore.getters.getRequestById(SET_PASSWORD_REQUEST)
+    },
+    setPasswordRequestStatus () {
+      let r = this.setPasswordRequest
       if (r === -1) { return 0 } else { return r.status }
     },
     registerRequest () {
@@ -252,11 +282,6 @@ export default {
       }
       this.$appointmentguru.endpoint('auth-validate-otp', options)
     },
-    autoLogin () {
-      this.user.phoneNumber = '+27...'
-      this.user.password = '...'
-      this.login()
-    },
     setToken (token) {
       let data = [
         this.$appointmentguru.name,
@@ -279,6 +304,16 @@ export default {
       }
       this.$appointmentguru
         .endpoint('auth-register', options)
+    },
+    setPassword () {
+      let options = {
+        id: SET_PASSWORD_REQUEST,
+        data: {
+          password: this.user.password
+        }
+      }
+      this.$appointmentguru
+        .endpoint('auth-set-password', options)
     }
   }
 }
