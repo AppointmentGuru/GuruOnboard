@@ -1,0 +1,30 @@
+- hosts: localhost
+  vars:
+    bucket: static.appointmentguru.co
+    version: latest
+    app: onboardguru
+    deleted_versions:
+      - test
+  vars_prompt:
+  - name: version
+    prompt: 'Provide a name for the release'
+    default: 'latest'
+    private: no
+  tasks:
+  - name: Upload files
+    s3_sync:
+      aws_access_key: '{{aws_access_key}}'
+      aws_secret_key: '{{aws_secret_key}}'
+      bucket: '{{bucket}}'
+      file_root: docs/
+      key_prefix: '{{app}}/{{version}}'
+      permission: public-read
+      region: eu-central-1
+
+  # - name: Ensure old versions are deleted
+  #   s3:
+  #     bucket: "{{item}}"
+  #     mode: delete
+  #   with_items: "{{deleted_versions}}"
+
+
